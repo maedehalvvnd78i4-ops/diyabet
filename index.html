@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پلتفرم هوشمند تشخیص دیابت</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --accent: #8b5cf6;
+    --success: #10b981;
+    --danger: #ef4444;
+    --dark: #1e1b4b;
+    --light: #f8fafc;
+  }
+
+  body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    min-height: 100vh;
+    background: #0f0c29;
+    background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #4f46e5);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* حباب‌های تزئینی پس‌زمینه */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    z-index: 0;
+    animation: float 20s ease-in-out infinite;
+  }
+  .blob-1 { width: 400px; height: 400px; background: #6366f1; top: -100px; right: -100px; }
+  .blob-2 { width: 350px; height: 350px; background: #ec4899; bottom: -100px; left: -100px; animation-delay: -5s; }
+  .blob-3 { width: 300px; height: 300px; background: #06b6d4; top: 50%; left: 50%; animation-delay: -10s; }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+  }
+
+  .container {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    max-width: 560px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9));
+    padding: 36px 32px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+    animation: shimmer 8s linear infinite;
+  }
+
+  @keyframes shimmer {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .logo-wrapper {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .header h1 {
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .header p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+  }
+
+  .body { padding: 32px; }
+
+  .info-banner {
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 26px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #c7d2fe;
+    line-height: 1.7;
+  }
+
+  .info-banner .ico { font-size: 20px; flex-shrink: 0; }
+
+  .field { margin-bottom: 20px; }
+
+  .field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+    font-weight: 600;
+    color: #e0e7ff;
+    font-size: 14px;
+  }
+
+  .field label .badge {
+    background: rgba(139, 92, 246, 0.3);
+    color: #c4b5fd;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-right: auto;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .input-wrapper .input-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: 0.6;
+    pointer-events: none;
+    transition: all 0.3s;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px 46px 14px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #fff;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+  }
+
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 400;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  }
+
+  input:focus + .input-icon,
+  .input-wrapper:focus-within .input-icon {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* حذف فلش‌های عددی */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  button {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    background-size: 200% auto;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.6);
+    position: relative;
+    overflow: hidden;
+  }
+
+  button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+  }
+
+  button:hover {
+    background-position: right center;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px -5px rgba(139, 92, 246, 0.7);
+  }
+
+  button:hover::before { left: 100%; }
+  button:active { transform: translateY(-1px); }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .result {
+    margin-top: 22px;
+    padding: 24px 20px;
+    border-radius: 18px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    display: none;
+    animation: resultIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  @keyframes resultIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .result.positive {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+    border: 2px solid rgba(239, 68, 68, 0.6);
+    color: #fecaca;
+    box-shadow: 0 10px 40px -10px rgba(239, 68, 68, 0.5);
+  }
+
+  .result.negative {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15));
+    border: 2px solid rgba(16, 185, 129, 0.6);
+    color: #a7f3d0;
+    box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.5);
+  }
+
+  .result .icon {
+    font-size: 44px;
+    display: block;
+    margin-bottom: 10px;
+    animation: bounce 1s ease infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .result .title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .result .sub {
+    font-size: 12.5px;
+    font-weight: 400;
+    margin-top: 8px;
+    opacity: 0.85;
+    line-height: 1.7;
+  }
+
+  .confidence {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+
+  .error {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15));
+    color: #fde68a;
+    border: 2px solid rgba(251, 191, 36, 0.6);
+    padding: 14px 16px;
+    border-radius: 14px;
+    margin-top: 16px;
+    font-size: 13.5px;
+    display: none;
+    animation: shake 0.5s;
+    font-weight: 500;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.8;
+  }
+
+  /* لودینگ */
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 480px) {
+    .body { padding: 24px 20px; }
+    .header { padding: 28px 20px 22px; }
+    .header h1 { font-size: 21px; }
+    .logo-wrapper { width: 60px; height: 60px; font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- حباب‌های تزئینی -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="logo-wrapper">🩺</div>
+    <h1>پلتفرم هوشمند تشخیص دیابت</h1>
+    <p>تحلیل سریع بر اساس مدل درخت تصمیم</p>
+  </div>
+
+  <div class="body">
+    <div class="info-banner">
+      <span class="ico">💡</span>
+      <span>برای دریافت نتیجه دقیق‌تر، مقادیر واقعی آزمایش خود را وارد کنید.</span>
+    </div>
+
+    <div class="field">
+      <label>
+        <span>🩸 قند خون (Glucose)</span>
+        <span class="badge">mg/dL</span>
+      </label>
+      <div class="input-wrapper">
+        <input type="number" id="glucose" placeholder="مثال: 148" step="any">
+        <span class="input-icon">🩸</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>
+        <span>🎂 سن (Age)</span>
+        <span class="badge">سال</span>
+      </label>
+      <div class="input-wrapper">
+        <input type="number" id="age" placeholder="مثال: 33" step="any">
+        <span class="input-icon">🎂</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>
+        <span>⚖️ شاخص توده بدنی (BMI)</span>
+        <span class="badge">kg/m²</span>
+      </label>
+      <div class="input-wrapper">
+        <input type="number" id="bmi" placeholder="مثال: 33.6" step="any">
+        <span class="input-icon">⚖️</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>
+        <span>🧬 عملکرد شجره‌نامه دیابت (DPF)</span>
+        <span class="badge">0 - 2.5</span>
+      </label>
+      <div class="input-wrapper">
+        <input type="number" id="dpf" placeholder="مثال: 0.627" step="any">
+        <span class="input-icon">🧬</span>
+      </div>
+    </div>
+
+    <button onclick="predict()" id="submitBtn">
+      <span class="spinner" id="spinner"></span>
+      <span id="btnText">🔍 تحلیل و تشخیص</span>
+    </button>
+
+    <div id="error" class="error"></div>
+    <div id="result" class="result"></div>
+
+    <div class="footer-note">
+      ⚕️ این ابزار جایگزین تشخیص پزشک نیست و تنها جنبه آموزشی دارد.
+    </div>
+  </div>
+</div>
+
+<script>
+function predict() {
+  const glucose = parseFloat(document.getElementById('glucose').value);
+  const age = parseFloat(document.getElementById('age').value);
+  const bmi = parseFloat(document.getElementById('bmi').value);
+  const dpf = parseFloat(document.getElementById('dpf').value);
+
+  const errorEl = document.getElementById('error');
+  const resultEl = document.getElementById('result');
+  const btn = document.getElementById('submitBtn');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btnText');
+
+  // اعتبارسنجی
+  if ([glucose, age, bmi, dpf].some(v => isNaN(v) || v < 0)) {
+    errorEl.textContent = '⚠️ لطفاً همه مقادیر را به‌درستی وارد کنید (اعداد غیرمنفی).';
+    errorEl.style.display = 'block';
+    resultEl.style.display = 'none';
+    return;
+  }
+
+  errorEl.style.display = 'none';
+
+  // افکت لودینگ کوتاه برای زیبایی
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnText.textContent = 'در حال تحلیل...';
+
+  setTimeout(() => {
+    // پیاده‌سازی درخت تصمیم
+    let result;
+    if (glucose <= 154) {
+      if (age <= 29) {
+        result = 0;
+      } else {
+        if (bmi <= 26.700) {
+          result = 0;
+        } else {
+          if (glucose <= 101) {
+            result = (dpf <= 0.709) ? 0 : 1;
+          } else {
+            if (bmi <= 43.300) {
+              result = (dpf <= 0.464) ? 0 : 1;
+            } else {
+              result = 1;
+            }
+          }
+        }
+      }
+    } else {
+      if (dpf <= 0.307) {
+        result = (dpf <= 0.287) ? 1 : 0;
+      } else {
+        result = 1;
+      }
+    }
+
+    // نمایش نتیجه
+    resultEl.className = 'result ' + (result === 1 ? 'positive' : 'negative');
+    if (result === 1) {
+      resultEl.innerHTML = `
+        <span class="icon">⚠️</span>
+        <span class="title">احتمال وجود دیابت</span>
+        <span class="confidence">نتیجه: مثبت</span>
+        <div class="sub">توصیه می‌شود برای بررسی دقیق‌تر و انجام آزمایش‌های تکمیلی به پزشک مراجعه کنید.</div>
+      `;
+    } else {
+      resultEl.innerHTML = `
+        <span class="icon">✅</span>
+        <span class="title">عدم احتمال دیابت</span>
+        <span class="confidence">نتیجه: منفی</span>
+        <div class="sub">بر اساس مدل، نشانه‌ای از دیابت مشاهده نشد. با این حال، معاینات دوره‌ای را فراموش نکنید.</div>
+      `;
+    }
+    resultEl.style.display = 'block';
+
+    // بازگردانی دکمه
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    btnText.textContent = '🔍 تحلیل و تشخیص';
+  }, 600);
+}
+
+// Enter برای ارسال
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') predict();
+  });
+});
+</script>
+</body>
+</html>
